@@ -28,7 +28,6 @@ then
     echo "Ready to go"
 else
     # Delete Container
-    #$CTR task kill --all $CONATINER_NAME
     $CTR task rm -f $CONATINER_NAME
     $CTR c rm $CONATINER_NAME
     echo "Container '$CONATINER_NAME' removed"
@@ -53,10 +52,3 @@ do
     echo "Response status: $response_status"
 done
 
-#TODO
-#time (
-#    curl localhost:5000
-#    while [ current_time <= $cutoff ]; do
-#        actions # Loop execution
-#    done
-#)
