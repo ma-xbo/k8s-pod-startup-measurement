@@ -57,8 +57,8 @@ time (
 
     echo ------------------------
 
-    # Send request to the webserver -> curl POD_IP:5000
-    echo "Send request to the webserver"
+    # Send request to the web server from inside the container -> curl localhost:5000
+    echo "Send request to the web server from inside the container"
     response_status=$($KUBECTL exec deploy/$DEPLOYMENT_NAME -- curl -s -o -I -w "%{http_code}" localhost:5000)
     while [ "$response_status" != "200" ] 
     do
@@ -66,7 +66,7 @@ time (
         echo "Response: $response_status"
     done
 
-    # print the response to the command line
+    # Print the response to the command line
     response=$($KUBECTL exec deploy/$DEPLOYMENT_NAME -- curl localhost:5000)
-    echo "Response of the webserver: '$response'"
+    echo "Response of the web server: '$response'"
 )
