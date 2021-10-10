@@ -69,21 +69,21 @@ time (
     echo ------------------------
 
     # Get the ClusterIP of the Kubernetes Service
-    pod_ip=$($KUBECTL get po --selector=app=$CONATINER_NAME -o jsonpath='{.items[*].status.podIP}')
-    echo "The IP of the Pod is: $pod_ip"  
+    service_ip=$($KUBECTL get service/$SERVICE_NAME -o jsonpath='{.spec.clusterIP}')
+    echo "The ClusterIP of the service/$SERVICE_NAME is: $service_ip"  
 
     echo ------------------------
 
-    # Send request to the webserver -> curl POD_IP:5000
-    echo "Send request to the webserver"
-    response_status=$(curl -s -o --head -w "%{http_code}" $pod_ip:5000)
+    # Send request to the web server -> curl service_ip:5000
+    echo "Send request to the web server"
+    response_status=$(curl -s -o --head -w "%{http_code}" $service_ip:5000)
     while [ "$response_status" != "200" ] 
     do
-        response_status=$(curl -s -o --head -w "%{http_code}" $pod_ip:5000)
+        response_status=$(curl -s -o --head -w "%{http_code}" $service_ip:5000)
         echo "Response: $response_status"
     done
 
-    # print the response to the command line
-    response=$(curl $pod_ip:5000)
-    echo "Response of the webserver: '$response'"
+    # Print the response to the command line
+    response=$(curl $service_ip:5000)
+    echo "Response of the web server: '$response'"
 )
