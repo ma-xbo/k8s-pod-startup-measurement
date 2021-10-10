@@ -3,10 +3,13 @@
 scriptDir=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
 cd $scriptDir
 
+# Prerequisites
+# - Make sure the Kubernetes RuntimeClass for the respective Container Runtime has been created before running the script
+
 IMAGE_NAME="ghcr.io/ma-xbo/basic-python-webserver:latest"
 CONATINER_NAME="basic-python-webserver"
-RUNTIME="io.containerd.runsc.v1" # io.containerd.runc.v1 | io.containerd.runsc.v1 | io.containerd.kata.v2
-CTR="sudo microk8s ctr"
+RUNTIME="io.containerd.runc.v1" # io.containerd.runc.v1 | io.containerd.runsc.v1 | io.containerd.kata.v2
+CTR="sudo ctr"
 
 # check if the defined container image is already been pulled
 image=$($CTR i ls | grep $IMAGE_NAME)
@@ -25,7 +28,7 @@ container=$($CTR c ls | grep $IMAGE_NAME)
 if [ -z "$container" ]
 then
     # Container does not exist
-    echo "Ready to go"
+    echo "Container does not exist"
 else
     # Delete Container
     $CTR task rm -f $CONATINER_NAME
@@ -33,22 +36,24 @@ else
     echo "Container '$CONATINER_NAME' removed"
 fi
 
+sleep 1.0s
 echo -----------
 
-# Create and run the container
-$CTR container create --runtime $RUNTIME -t $IMAGE_NAME $CONATINER_NAME
-echo "Container '$CONATINER_NAME' created"
+time (
+    # Create and run the container
+    $CTR container create --runtime $RUNTIME -t $IMAGE_NAME $CONATINER_NAME
+    echo "Container '$CONATINER_NAME' created"
 
-$CTR task start -d $CONATINER_NAME
-echo "Container '$CONATINER_NAME' started"
+    $CTR task start -d $CONATINER_NAME
+    echo "Container '$CONATINER_NAME' started"
 
-echo -----------
+    echo -----------
 
-# Polling curl localhost:5000
-response_status=$($CTR task exec -t --exec-id curl1 basic-python-webserver curl -s -o -I -w "%{http_code}" 127.0.0.1:5000)
-while [ "$response_status" != "200" ] 
-do
+    # Polling curl localhost:5000
     response_status=$($CTR task exec -t --exec-id curl1 basic-python-webserver curl -s -o -I -w "%{http_code}" 127.0.0.1:5000)
-    echo "Response status: $response_status"
-done
-
+    while [ "$response_status" != "200" ] 
+    do
+        response_status=$($CTR task exec -t --exec-id curl1 basic-python-webserver curl -s -o -I -w "%{http_code}" 127.0.0.1:5000)
+        echo "Response status: $response_status"
+    done
+)
