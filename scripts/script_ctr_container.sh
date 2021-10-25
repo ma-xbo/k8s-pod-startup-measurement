@@ -8,7 +8,7 @@ cd $scriptDir
 
 IMAGE_NAME="ghcr.io/ma-xbo/basic-python-webserver:latest"
 CONATINER_NAME="basic-python-webserver"
-RUNTIME="io.containerd.runc.v1" # io.containerd.runc.v1 | io.containerd.runsc.v1 | io.containerd.kata.v2
+RUNTIME="io.containerd.runc.v1" # io.containerd.runc.v1 | io.containerd.runsc.v1 | io.containerd.kata.v2 | io.containerd.kata-fc.v2
 CTR="sudo ctr"
 
 # check if the defined container image is already been pulled
@@ -40,10 +40,18 @@ sleep 1.0s
 echo -----------
 
 time (
-    # Create and run the container
-    $CTR container create --runtime $RUNTIME -t $IMAGE_NAME $CONATINER_NAME
+    # Create the container
+    if [ "$RUNTIME" == "io.containerd.kata-fc.v2" ]
+    then
+        # Create Container with snapshotter "devmapper"
+        $CTR container create --snapshotter devmapper --runtime $RUNTIME -t $IMAGE_NAME $CONATINER_NAME
+    else
+        # Create Container with default snapshotter
+        $CTR container create --runtime $RUNTIME -t $IMAGE_NAME $CONATINER_NAME
+    fi
     echo "Container '$CONATINER_NAME' created"
 
+    # Start the Container
     $CTR task start -d $CONATINER_NAME
     echo "Container '$CONATINER_NAME' started"
 
