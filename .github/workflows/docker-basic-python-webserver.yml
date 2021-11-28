@@ -30,7 +30,7 @@ jobs:
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$APP_NAME
           VERSION=latest
-          docker build ./$APP_NAME --tag $IMAGE_ID:$VERSION
+          docker build ./applications/$APP_NAME --tag $IMAGE_ID:$VERSION
 
       - name: Log into GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
