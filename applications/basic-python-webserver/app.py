@@ -5,6 +5,6 @@ app = Flask(__name__)
 def hello_world():
     return 'Hello from Webserver'
 
-@app.route('/cakes')
-def cakes():
-    return 'Yummy cakes!'
+@app.route('/dummy')
+def dummy():
+    return 'This is a dummy route!'
