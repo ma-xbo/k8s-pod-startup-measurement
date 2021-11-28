@@ -1,5 +1,5 @@
 # Basic Python Webserver
-The provided application represents a minimal Flask web server.
+The provided application represents a minimal Flask web server. 
 When changes to the code base are pushed, a new container image is automatically created using a GitHub action.
 ## Available routes of the web server
 - /
